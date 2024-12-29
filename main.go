@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	actions.InitHealth()
 	interactions.PrintInstructions()
 
 	result := interactions.GetLayerchoice()
@@ -32,7 +33,7 @@ func main() {
 		fmt.Println("Your choice is invalid type!")
 		return
 	}
-	playerHealth, monsterHealth := actions.GethealthAmount()
+	playerHealth, monsterHealth := actions.GetHealthAmount()
 
 	fmt.Printf("Player's health: %d\n", playerHealth)
 	fmt.Printf("Monster's health: %d\n", monsterHealth)
