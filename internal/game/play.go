@@ -2,47 +2,63 @@ package game
 
 import (
 	"fmt"
+	"time"
 )
 
 func InitHealth() {
-	*MonsterHealth = 100
-	*PlayersHealth = 100
+	*CurrentMonsterHealth = 100
+	*CurrentPlayerHealth = 100
 
 }
 func Play() {
 	PrintInstructions()
-	*Winner = ""
-	for *Winner == "" {
-		*Winner = RoundsGame()
+
+	Winner := ""
+	GameStartTime := time.Now()
+	for Winner == "" {
+		Winner = executerounds()
 	}
-	PrintResult(*Winner)
+
+	PlayerStatus.TotalRounds = CurrentRound
+	PlayerStatus.TotalTime = time.Since(GameStartTime)
+	PlayerStatus.LastPlayedAt = time.Now()
+
+	PrintResult(Winner)
+
+	PrintStatus(PlayerStatus)
 }
 
-func RoundsGame() string {
-	switch GetUserChoice() {
+func executerounds() string {
+	CurrentRound++
+	UserChoice := GetUserChoice()
+
+	switch UserChoice {
 	case "Attack":
-		*playerAttackDmg = PlayersAttack()
-		*monsterAttackDmg = MonsterAttack()
-		fmt.Printf("You attacked the monster and dealt %d damage.\n", *playerAttackDmg)
-		fmt.Printf("The monster attacked you and dealt %d damage.\n", *monsterAttackDmg)
-
+		*PlayerAttackDmg = PlayersAttack()
+		*MonsterAttackDmg = MonsterAttack()
 	case "Heal":
-		*healValue = PlayerSelfHeal()
-		*monsterAttackDmg = MonsterAttack()
-		fmt.Printf("You healed yourself for %d health.\n", *healValue)
-		fmt.Printf("The monster attacked you and dealt %d damage.\n", *monsterAttackDmg)
+		*PlayerhealValue = PlayerSelfHeal()
+		*MonsterAttackDmg = MonsterAttack()
 	default:
-		fmt.Println("Your choice is invalid type!")
-		return ""
-
+		fmt.Println("Your choice is Invalid type!")
 	}
-	GetHealthAmount()
-	fmt.Printf("Player's health: %d\n", *PlayersHealth)
-	fmt.Printf("Monster's health: %d\n", *MonsterHealth)
+	*CurrentPlayerHealth, *CurrentMonsterHealth = GetHealthAmount()
 
-	if *PlayersHealth <= 0 {
+	RoundData := RoundData{
+		Action:           UserChoice,
+		PlayerAttackDmg:  *PlayerAttackDmg,
+		PlayerSelfHeal:   *PlayerhealValue,
+		MonsterAttackDmg: *MonsterAttackDmg,
+		PlayerHealth:     *CurrentPlayerHealth,
+		MonsterHealth:    *CurrentMonsterHealth,
+	}
+
+	RoundHistory = append(RoundHistory, RoundData)
+	PrintRounds(&RoundData)
+
+	if *CurrentPlayerHealth <= 0 {
 		return "Monster"
-	} else if *MonsterHealth <= 0 {
+	} else if *CurrentMonsterHealth <= 0 {
 		return "Player"
 
 	} else {

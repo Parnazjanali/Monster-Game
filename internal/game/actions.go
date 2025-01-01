@@ -49,9 +49,9 @@ func MonsterAttack() int {
 	maxAttackMonster := MONSTER_ATTACK_MAX_DMG
 
 	dmgValue := RandomNumber(minAttackMonster, maxAttackMonster)
-	*PlayersHealth -= dmgValue
-	if *PlayersHealth < 0 {
-		*PlayersHealth = 0
+	*CurrentPlayerHealth -= dmgValue
+	if *CurrentPlayerHealth < 0 {
+		*CurrentPlayerHealth = 0
 	}
 	return dmgValue
 
@@ -61,9 +61,9 @@ func PlayersAttack() int {
 	maxAttackPlayer := PLAYER_MAX_ATTACK_DMG
 
 	dmgValue := RandomNumber(minAttackPlayer, maxAttackPlayer)
-	*MonsterHealth -= dmgValue
-	if *MonsterHealth < 0 {
-		*MonsterHealth = 0
+	*CurrentMonsterHealth -= dmgValue
+	if *CurrentMonsterHealth < 0 {
+		*CurrentMonsterHealth = 0
 	}
 	return dmgValue
 
@@ -71,11 +71,12 @@ func PlayersAttack() int {
 func PlayerSelfHeal() int {
 	minHealPlayer := PLAYER_SELF_HEAL_MINVALUE
 	maxHealPlayer := PLAYER_SELF_HEAL_MAXVALUE
+
 	healValue := RandomNumber(minHealPlayer, maxHealPlayer)
-	if *PlayersHealth+healValue > 100 {
-		healValue = 100 - *PlayersHealth
+	if *CurrentPlayerHealth+healValue > 100 {
+		healValue = 100 - *CurrentPlayerHealth
 	}
-	*PlayersHealth += healValue
+	*CurrentPlayerHealth += healValue
 	return healValue
 
 }
@@ -84,10 +85,40 @@ func RandomNumber(min int, max int) int {
 	return randgenerator.Intn(max-min+1) + min
 }
 func GetHealthAmount() (int, int) {
-	return *PlayersHealth, *MonsterHealth
+	return *CurrentPlayerHealth, *CurrentMonsterHealth
+}
+func PrintRounds(Round *RoundData) {
+	if Round.Action == "Attack" {
+		fmt.Printf("Player Attacked Monster for %v damage.\n", Round.PlayerAttackDmg)
+	} else {
+		fmt.Printf("Player Healed self for %v value.\n", Round.PlayerSelfHeal)
+	}
+	fmt.Printf("Monster Attacked Player for %v damage.\n", Round.MonsterAttackDmg)
+	fmt.Printf("Player's Health:%v\n", Round.PlayerHealth)
+	fmt.Printf("Monster's Health:%v\n", Round.MonsterHealth)
+}
+
+func PrintStatus(PlayerStatus *StatusData) {
+	fmt.Println("Game Status:")
+	fmt.Printf("Total Rounds: %d\n  Total Time: %s\n  Last Played At: %s\n",
+		PlayerStatus.TotalRounds,
+		PlayerStatus.TotalTime.String(),
+		PlayerStatus.LastPlayedAt.Format("2006-01-02 15:04:05"),
+	)
+	fmt.Println("------------------------")
+}
+func CalculateStatus(rounds []*RoundData, StartAt time.Time) StatusData {
+	totalRounds := len(rounds)
+	totalTime := time.Duration(0)
+	lastPlayedAt := StartAt
+
+	return StatusData{
+		TotalRounds:  totalRounds,
+		TotalTime:    totalTime,
+		LastPlayedAt: lastPlayedAt,
+	}
 }
 func PrintResult(Winner string) {
-	fmt.Println("--------------")
 	fmt.Println("Game Over!")
 	fmt.Printf("%v Won!", Winner)
 }
