@@ -11,22 +11,29 @@ func InitHealth() {
 }
 func Play() {
 	PrintInstructions()
+	*Winner = ""
+	for *Winner == "" {
+		*Winner = RoundsGame()
+	}
+	PrintResult(*Winner)
+}
 
-	switch GetLayerChoice() {
+func RoundsGame() string {
+	switch GetUserChoice() {
 	case "Attack":
 		*playerAttackDmg = PlayersAttack()
 		*monsterAttackDmg = MonsterAttack()
 		fmt.Printf("You attacked the monster and dealt %d damage.\n", *playerAttackDmg)
 		fmt.Printf("The monster attacked you and dealt %d damage.\n", *monsterAttackDmg)
 
-	case "heal":
+	case "Heal":
 		*healValue = PlayerSelfHeal()
 		*monsterAttackDmg = MonsterAttack()
 		fmt.Printf("You healed yourself for %d health.\n", *healValue)
 		fmt.Printf("The monster attacked you and dealt %d damage.\n", *monsterAttackDmg)
 	default:
 		fmt.Println("Your choice is invalid type!")
-		return
+		return ""
 
 	}
 	GetHealthAmount()
@@ -34,12 +41,12 @@ func Play() {
 	fmt.Printf("Monster's health: %d\n", *MonsterHealth)
 
 	if *PlayersHealth <= 0 {
-		fmt.Println("You lost! The monster won.")
-
+		return "Monster"
 	} else if *MonsterHealth <= 0 {
-		fmt.Println("Monster lost! You won the game.")
+		return "Player"
 
 	} else {
 		fmt.Println("continue!")
 	}
+	return ""
 }

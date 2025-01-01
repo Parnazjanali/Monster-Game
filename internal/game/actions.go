@@ -31,7 +31,7 @@ func GetUserinput() (string, error) {
 
 	return cleanedInput, nil
 }
-func GetLayerChoice() string {
+func GetUserChoice() string {
 	for {
 		userchoice, _ := GetUserinput()
 
@@ -85,4 +85,9 @@ func RandomNumber(min int, max int) int {
 }
 func GetHealthAmount() (int, int) {
 	return *PlayersHealth, *MonsterHealth
+}
+func PrintResult(Winner string) {
+	fmt.Println("--------------")
+	fmt.Println("Game Over!")
+	fmt.Printf("%v Won!", Winner)
 }
